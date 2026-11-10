@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The water analogy</title>
+<style>
+:root{--bg:#f4f7fa;--card:#fff;--ink:#14212b;--mute:#5b6b78;--line:#d5dee6;--water:#2f86c0;--water2:#a9d3ee;--amber:#e3a21a;--red:#d1493f;--green:#2e9b6a;--track:#e6edf3;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a22;--card:#17262f;--ink:#e8f0f6;--mute:#9db0be;--line:#2a3d49;--water:#4aa3de;--water2:#1f4a66;--amber:#f0b83a;--red:#ef6a60;--green:#4cc28c;--track:#22343f}}
+:root[data-theme="dark"]{--bg:#0f1a22;--card:#17262f;--ink:#e8f0f6;--mute:#9db0be;--line:#2a3d49;--water:#4aa3de;--water2:#1f4a66;--amber:#f0b83a;--red:#ef6a60;--green:#4cc28c;--track:#22343f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:28px 16px 48px}
+h1{font:700 clamp(26px,5vw,38px)/1.15 Georgia,"Times New Roman",serif;margin:0 0 10px}
+h2{font:700 21px/1.25 Georgia,serif;margin:0 0 6px}
+.lead{color:var(--mute);margin:0 0 24px}
+.eq{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-weight:600;margin:0 0 28px}
+.eq span{padding:6px 12px;border-radius:8px;background:var(--card);border:1px solid var(--line)}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:0 0 26px}
+.fig p{margin:0 0 12px;color:var(--mute)}
+svg{width:100%;height:auto;display:block;max-width:100%}
+.ctl{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;margin-top:12px;font-size:14px}
+.ctl output{font-weight:700;min-width:84px;text-align:right}
+input[type=range]{width:100%;accent-color:var(--water)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button{font:inherit;font-weight:600;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--water)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.read{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.read div{flex:1 1 180px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-size:14px}
+.read b{display:block;font-size:19px}
+.note{font-size:13px;color:var(--mute);margin-top:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.two{grid-template-columns:1fr}}
+.panel{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg)}
+.bar{height:12px;border-radius:6px;background:var(--track);overflow:hidden;margin:3px 0 9px}
+.bar i{display:block;height:100%;border-radius:6px}
+.lbl{font-size:13px;display:flex;justify-content:space-between}
+text{font-family:system-ui,sans-serif}
+</style>
+</head>
+<body>
+<main>
+<section class="fig" aria-labelledby="h1">
+<h2 id="h1">The water analogy</h2>
+<p>Flow rate is power. The water collected in the tank over time is energy.</p>
+<svg viewBox="0 0 640 220" role="img" aria-label="A hose filling a tank. Stronger flow and longer time fill the tank more.">
+<rect x="20" y="82" width="120" height="30" rx="6" fill="var(--mute)"/>
+<rect x="140" y="88" width="46" height="18" fill="var(--ink)"/>
+<g id="drops"></g>
+<path id="stream" d="M186 97 Q300 97 430 150" fill="none" stroke="var(--water)" stroke-width="6" stroke-linecap="round"/>
+<rect x="430" y="60" width="170" height="140" rx="6" fill="none" stroke="var(--ink)" stroke-width="4"/>
+<rect id="fill" x="434" y="196" width="162" height="0" fill="var(--water)"/>
+<text x="515" y="50" text-anchor="middle" font-size="14" fill="var(--mute)">Tank (energy collected)</text>
+<text x="100" y="140" text-anchor="middle" font-size="14" fill="var(--mute)">Hose (power)</text>
+</svg>
+<div class="ctl"><label for="rate">Flow rate</label><input id="rate" type="range" min="0.1" max="100" step="0.1" value="100"><output id="rateO"></output>
+<label for="hrs">Time</label><input id="hrs" type="range" min="0.5" max="24" step="0.5" value="0.5"><output id="hrsO"></output></div>
+<div class="btns"><button id="pFire">Fire hose</button><button id="pDrip">Dripping faucet</button></div>
+<div class="read"><div>Power<b id="wP"></b></div><div>Energy collected<b id="wE"></b></div></div>
+<p class="note">Illustrative numbers. Tank holds 6,000 litres.</p>
+</section>
+</main>
+<script>
+var $=function(i){return document.getElementById(i)};
+function water(){var r=+$('rate').value,h=+$('hrs').value,L=r*60*h,f=Math.min(1,L/6000);
+$('rateO').textContent=r+' L/min';$('hrsO').textContent=h+' h';
+$('wP').textContent=r+' litres per minute';$('wE').textContent=Math.round(L).toLocaleString()+' litres';
+var H=Math.round(132*f);$('fill').setAttribute('height',H);$('fill').setAttribute('y',196-H);
+$('stream').setAttribute('stroke-width',Math.max(1.5,Math.min(14,2+r/8)));}
+$('rate').oninput=$('hrs').oninput=water;
+$('pFire').onclick=function(){$('rate').value=100;$('hrs').value=0.5;water()};
+$('pDrip').onclick=function(){$('rate').value=0.5;$('hrs').value=24;water()};water();
+</script>
+</body>
+</html>
